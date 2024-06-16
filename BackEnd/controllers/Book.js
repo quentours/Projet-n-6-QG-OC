@@ -26,10 +26,10 @@ exports.getBestRating = (req, res, next) => {
   Book.find()
     .sort({ averageRating: -1 })
     .limit(3)
-    .then((books) => {
-      res.status(200).json(books)
+    .then((books) => res.status(200).json(books))
+    .catch((error) => {
+      res.status(404).json({ error })
     })
-    .catch((error) => res.status(400).json({ error }))
 }
 
 // Logique métier de la reqête POST
@@ -109,24 +109,10 @@ exports.deleteBook = (req, res, next) => {
 exports.addBookRating = (req, res, next) => {
   const bookId = req.params.id
   const userId = req.auth.userId
-  const grade = req.body.grade
-
-  //  À revérifier par rapport au front
-
-  if (grade < 0 || grade > 5) {
-    return res
-      .status(400)
-      .json({ message: 'La note doit être comprise entre 0 et 5' })
-  }
-
-  //  À revérifier par rapport au front
+  const grade = req.body.rating
 
   Book.findById(bookId)
     .then((book) => {
-      if (!book) {
-        return res.status(404).json({ error: 'Livre non trouvé' })
-      }
-
       const existingRating = book.ratings.find(
         (rating) => rating.userId === userId
       )

@@ -4,10 +4,10 @@ const userCtrl = require('../controllers/User')
 
 // Route de la requête POST SIGNUP
 
-router.post('/', userCtrl.signup)
+router.post('/signup', userCtrl.signup)
 
 // Route de la requête POST LOGIN
 
-router.post('/', userCtrl.login)
+router.post('/login', userCtrl.login)
 
 module.exports = router

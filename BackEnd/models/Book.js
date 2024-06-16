@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
 const bookSchema = mongoose.Schema({
+  userId: { type: String, required: true },
   title: { type: String, requiered: true },
   author: { type: String, requiered: true },
   imageUrl: { type: String, requiered: true },
@@ -8,11 +9,11 @@ const bookSchema = mongoose.Schema({
   genre: { type: String, requiered: true },
   ratings: [
     {
-      userId: { type: String, required: true },
-      grade: { type: Number, required: true, min: 0, max: 5 },
+      userId: { type: String },
+      grade: { type: Number },
     },
   ],
-  averageRating: { type: Number, required: true, default: 0 },
+  averageRating: { type: Number },
 })
 
 bookSchema.methods.updateAverageRating = function () {

@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const auth = require('../middleware/auth')
+const { upload, processImage } = require('../middleware/mutler-config')
 const multer = require('../middleware/mutler-config')
 
 // Import du controlleur
@@ -9,23 +10,23 @@ const bookCtrl = require('../controllers/Book')
 
 // Route de la requête GET ALL
 
-router.get('/', auth, bookCtrl.getAllBooks)
-
-// Route de la requête GET ONE
-
-router.get('/id', auth, bookCtrl.getOneBook)
+router.get('/', bookCtrl.getAllBooks)
 
 // Route de la requête GET BEST RATING
 
-router.get('/bestrating', auth, bookCtrl.getBestRating)
+router.get('/bestrating', bookCtrl.getBestRating)
+
+// Route de la requête GET ONE
+
+router.get('/:id', bookCtrl.getOneBook)
 
 // Route de la requête POST
 
-router.post('/', auth, multer, bookCtrl.createBook)
+router.post('/', auth, upload, processImage, bookCtrl.createBook)
 
 // Route de la requête PUT
 
-router.put('/:id', auth, multer, bookCtrl.modifyBook)
+router.put('/:id', auth, upload, processImage, bookCtrl.modifyBook)
 
 // Route de la requête DELETE
 

@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
@@ -16,17 +17,21 @@ const userRoutes = require('./Routes/user')
 
 // Connection à l'API MongoDB
 
+console.log('MONGODB_URI:', process.env.MONGODB_URI)
+
 mongoose
-  .connect(
-    'mongodb+srv://quentinguihard:tblBN8uApwKEG8PG@clustergrimoire.po2y6rn.mongodb.net/?retryWrites=true&w=majority&appName=ClusterGrimoire',
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log('Connexion à MongoDB résussie !'))
   .catch(() => console.log('Connexion à MongoDB échoué'))
 
 const app = express()
 
 // Autorisation pour les CORS
+
+app.use(bodyParser.json())
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -43,14 +48,10 @@ app.use((req, res, next) => {
 
 // Enregistrement des routeur Livres et users
 
-app.use(bodyParser.json())
-
 app.use('/images', express.static(path.join(__dirname, 'images')))
-
-app.use('/api/books', bookRoutes)
 
 app.use('/api/auth', userRoutes)
 
-app.use(bodyParser.json())
+app.use('/api/books', bookRoutes)
 
 module.exports = app

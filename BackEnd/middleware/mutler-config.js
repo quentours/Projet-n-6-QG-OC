@@ -1,30 +1,53 @@
 const multer = require('multer')
+const sharp = require('sharp')
+const path = require('path')
+const fs = require('fs')
+const { error } = require('console')
+
+// Dictionnaire de format
 
 const MIME_TYPES = {
   'image/jpg': 'jpg',
   'image/jpeg': 'jpg',
   'image/png': 'png',
+  'image/webp': 'webp',
+}
+// Utilisation du stockage mémoire pour appliquer la compression et le changement de format via sharp
+
+const storage = multer.memoryStorage()
+
+const upload = multer({ storage }).single('image')
+
+const processImage = (req, res, next) => {
+  if (!req.file) {
+    return next()
+  }
+
+  // sépare le nom du fichier en utilisant les espaces comme délimiteur
+  // remplace ces espaces par des underscore _
+  // Sépare l'extension .jpeg ou autre du reste de la String
+  // Enlève cette extension, avant de la remplacer par celle choisie par sharp
+
+  const name = req.file.originalname
+    .split(' ')
+    .join('_')
+    .split('.')
+    .slice(0, -1)
+    .join('.')
+  const filename = `${name}${Date.now()}.webp`
+  const outputPath = path.join('images', filename)
+
+  sharp(req.file.buffer)
+    .webp({ quality: 50 })
+    .toFile(outputPath)
+    .then(() => {
+      req.file.filename = filename
+      req.file.path = outputPath
+      next()
+    })
+    .catch((error) => {
+      res.status(500).json({ error })
+    })
 }
 
-// Création de la constante storage, à passer à multer comme configuration, qui contient la logique nécéssaire pour indiquer à multer où enregistrer les fichiers entrants
-
-// Fonction destination indique à  multer d'enregistrer les fichiers dans le dossier images
-
-const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, 'images')
-  },
-
-  //   La fonction filename indique à multer d'utiliser le nom d'origine, de remplacer les espaces par des _ et d'ajouter un timestamp comme nom de fichier
-  //   Elle utiliser ensuitela constante dictionnaire de type MIME pour résoudre l'extension de fichier appropriée.
-
-  filename: (req, file, callback) => {
-    const name = file.originalname.split(' ').join('_')
-    const extension = MIME_TYPES[file.mimetype]
-    callback(null, name + Date.now() + '.' + extension)
-  },
-})
-
-//  Exports de notre fonction en lui passant storage et on indique que nous gérons uniquement les téléchargements de fichier images.
-
-module.exports = multer({ storage }).single('image')
+module.exports = { upload, processImage }

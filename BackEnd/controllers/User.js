@@ -16,18 +16,24 @@ exports.signup = (req, res, next) => {
   // Appel de la fonction de hachage de bcrypt et on lui demande de "saler" (nombre de fois que le mdp est passé dans l'algorythme de cryptage) le pw 10 fois
   // dans le bloc then, on créé un nouvel user et on l'enregistre dans notre DB
   bcrypt
-    .hash(req.body.pasword, 10)
+    .hash(req.body.password, 10)
     .then((hash) => {
       const user = new User({
         email: req.body.email,
-        pasword: hash,
+        password: hash,
       })
       user
         .save()
-        .then(() => res.status(201).json({ message: 'Utilisateur créé ' }))
-        .catch((error) => res.status(400).json({ error }))
+        .then(() =>
+          res.status(201).json({ message: 'Nouvel utilisateur enregistré' })
+        )
+        .catch((error) => {
+          res.status(500).json({ error })
+        })
     })
-    .catch((error) => res.status(500).json({ error }))
+    .catch((error) => {
+      res.status(500).json({ error })
+    })
 }
 
 // Logique métier la requête POST LOGIN
@@ -45,7 +51,7 @@ exports.login = (req, res, next) => {
         // Utilisation de la fonction compare de bcrypt pour vérifer que le mot de passe entré est bon
         // S'il l'est, on renvoi une réponse 200 avec l'ID user et un token
         bcrypt
-          .compare(req.body.pasword, user.pasword)
+          .compare(req.body.password, user.password)
           .then((valid) => {
             if (!valid) {
               res

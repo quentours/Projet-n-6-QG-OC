@@ -43,8 +43,7 @@ exports.createBook = (req, res, next) => {
     imageUrl: `${req.protocol}://${req.get('host')}/images/${
       req.file.filename
     }`,
-    ratings: [],
-    averageRating: 0,
+    averageRating: bookObject.ratings[0].grade,
   })
 
   book

@@ -1,3 +1,4 @@
+require('dotenv').config()
 const http = require('http')
 const app = require('./app')
 
@@ -15,7 +16,7 @@ const normalizePort = (val) => {
 }
 
 // Mettre le port dans le .env pour la sécurité
-const port = normalizePort(process.env.PORT || '4000')
+const port = normalizePort(process.env.PORT)
 
 // Port sur lequelle l'applicaiton est déployée
 app.set('port', port)

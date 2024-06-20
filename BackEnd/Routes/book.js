@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const auth = require('../middleware/auth')
 const { upload, processImage } = require('../middleware/mutler-config')
-const multer = require('../middleware/mutler-config')
 
 // Import du controlleur
 
